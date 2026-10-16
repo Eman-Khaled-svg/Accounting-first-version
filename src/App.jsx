@@ -3,7 +3,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "./FireBase";
 import { Ctx } from "./AppContext";
-import { DEF } from "./Lib";  ;
+import { DEF } from "./Lib";
 import Login from "./Login";
 import Boot from "./Boot";
 import Items from "./Items";
@@ -11,6 +11,36 @@ import Inv from "./Inv";
 import Exp from "./Exp";
 import Dash from "./Dash";
 import Admin from "./Admin";
+
+function Loading() {
+  return (
+    <div
+      dir="rtl"
+      className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 px-4"
+    >
+      <div className="rounded-3xl bg-white/10 p-8 shadow-2xl ring-1 ring-white/20 backdrop-blur-md">
+        <div className="flex flex-col items-center gap-5">
+          {/* السبينر */}
+          <div className="relative h-16 w-16">
+            <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
+            <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-amber-400"></div>
+          </div>
+
+          <p className="text-xl font-bold tracking-wide text-white">
+            جارٍ التحميل
+            <span className="inline-flex w-6">
+              <span className="animate-bounce [animation-delay:0ms]">.</span>
+              <span className="animate-bounce [animation-delay:150ms]">.</span>
+              <span className="animate-bounce [animation-delay:300ms]">.</span>
+            </span>
+          </p>
+
+          <p className="text-sm text-slate-300">من فضلك انتظر لحظات</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [u, setU] = useState(undefined), [prof, setP] = useState(undefined), [set, setS] = useState(null);
@@ -27,15 +57,15 @@ export default function App() {
     return onSnapshot(doc(db, "settings", "app"), s => setS({ ...DEF, ...(s.data() || {}) }), () => setS(DEF));
   }, [prof]);
 
-  if (u === undefined || (u && prof === undefined)) return <p style={{ padding: 20 }}>جارٍ التحميل...</p>;
+  if (u === undefined || (u && prof === undefined)) return <Loading />;
   if (!u) return <Login />;
   if (prof === null) return <Boot u={u} />;
   if (!prof.active) return <div className="card box"><p>حسابك معطَّل. تواصل مع المدير.</p><button onClick={() => signOut(auth)}>خروج</button></div>;
-  if (!set) return <p style={{ padding: 20 }}>جارٍ التحميل...</p>;
+  if (!set) return <Loading />;
 
   const admin = prof.role === "admin", can = admin || prof.role === "accountant";
   const T = [["dash", "لوحة التحكم"], ["items", "الأصناف والمخزون"], ["sales", "المبيعات"], ["purchases", "المشتريات"], ["exp", "المصاريف"], ...(admin ? [["admin", "الإدارة"]] : [])];
-    const flash = (t, e) => setM({ t, e });
+  const flash = (t, e) => setM({ t, e });
   const title = (T.find(x => x[0] === tab) || [])[1];
   const go = k => { setTab(k); setM(null); setMenu(false); };
 
