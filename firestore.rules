@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function me() { return get(/databases/$(db)/documents/users/$(request.auth.uid)).data; }
+    function on() { return request.auth != null && exists(/databases/$(db)/documents/users/$(request.auth.uid)) && me().active == true; }
+    function isAdmin() { return on() && me().role == 'admin'; }
+    function canWrite() { return on() && me().role in ['admin', 'accountant']; }
+    function noSettings() { return !exists(/databases/$(db)/documents/settings/app); }
+
+    match /users/{u} {
+      allow read: if request.auth != null && (request.auth.uid == u || isAdmin());
+      allow create: if isAdmin() || (request.auth.uid == u && request.resource.data.role == 'admin' && noSettings());
+      allow update, delete: if isAdmin();
+    }
+    match /settings/app {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && noSettings();
+      allow update: if isAdmin();
+    }
+    match /items/{d}    { allow read: if on(); allow write: if canWrite(); }
+    match /stats/{d}    { allow read: if on(); allow write: if canWrite(); }
+    match /counters/{d} { allow read: if on(); allow write: if canWrite(); }
+    match /sales/{d}     { allow read: if on(); allow create: if canWrite(); allow update: if isAdmin(); }
+    match /purchases/{d} { allow read: if on(); allow create: if canWrite(); allow update: if isAdmin(); }
+    match /expenses/{d}  { allow read: if on(); allow create: if canWrite(); allow update: if isAdmin(); }
+    match /audit/{d}     { allow read: if isAdmin(); allow create: if on(); }
+  }
+}
