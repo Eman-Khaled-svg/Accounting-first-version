@@ -1,156 +1,100 @@
-* {
-  box-sizing: border-box
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Cairo Variable", system-ui, sans-serif;
+  --color-ink: #0a0a0a;
+  --color-accent: #facc15;
+  --color-accent-hover: #eab308;
+  --color-good: #16a34a;
+  --color-bad: #dc2626;
 }
 
-body {
-  margin: 0;
-  font-family: Tahoma, Arial, sans-serif;
-  background: #f4f6f9;
-  color: #1b2430;
-  font-size: 14px
-}
-
-button {
-  cursor: pointer;
-  border: 0;
-  border-radius: 6px;
-  padding: 8px 14px;
-  background: #1f4e78;
-  color: #fff;
-  font: inherit
-}
-
-button.g {
-  background: #e3e8ee;
-  color: #1b2430
-}
-
-button.r {
-  background: #b00020
-}
-
-button:disabled {
-  opacity: .5
-}
-
-input,
-select {
-  padding: 8px;
-  border: 1px solid #c5cdd8;
-  border-radius: 6px;
-  font: inherit;
-  max-width: 100%
-}
-
-.app {
-  display: flex;
-  min-height: 100vh
-}
-
-nav {
-  width: 180px;
-  background: #1f4e78;
-  padding: 12px;
-  flex-shrink: 0
-}
-
-nav button {
-  display: block;
-  width: 100%;
-  margin: 4px 0;
-  text-align: right;
-  background: transparent
-}
-
-nav button.on {
-  background: #3b7bb0
-}
-
-main {
-  flex: 1;
-  padding: 16px;
-  overflow-x: auto
-}
-
-.card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 14px;
-  box-shadow: 0 1px 3px #0001
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse
-}
-
-th,
-td {
-  padding: 7px;
-  border-bottom: 1px solid #e5e9ef;
-  text-align: right;
-  white-space: nowrap
-}
-
-th {
-  background: #eef2f7
-}
-
-.row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 8px
-}
-
-.ln {
-  display: grid;
-  grid-template-columns: 120px 1fr 80px 100px 90px 32px;
-  gap: 6px;
-  margin-bottom: 6px;
-  align-items: center
-}
-
-.low {
-  background: #fde8e8
-}
-
-.void {
-  text-decoration: line-through;
-  color: #888
-}
-
-.err {
-  color: #b00020
-}
-
-.ok {
-  color: #0a7a3b
-}
-
-.box {
-  max-width: 340px;
-  margin: 15vh auto
-}
-
-@media(max-width:700px) {
-  .app {
-    flex-direction: column
+@layer base {
+  body {
+    @apply bg-neutral-100 font-sans text-base text-ink antialiased;
   }
 
-  nav {
-    width: auto;
-    display: flex;
-    flex-wrap: wrap
+  h3 {
+    @apply mb-3 text-lg font-bold;
   }
 
-  nav button {
-    width: auto
+  button {
+    @apply cursor-pointer rounded-xl bg-accent px-5 py-2.5 font-bold text-ink transition hover:bg-accent-hover active:scale-95 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  input,
+  select {
+    @apply max-w-full rounded-xl border-2 border-neutral-300 bg-white px-3 py-2.5 text-base outline-none focus:border-ink focus:ring-4 focus:ring-accent/50 disabled:bg-neutral-100;
+  }
+
+  input[type="checkbox"] {
+    @apply h-5 w-5 p-0 accent-ink;
+  }
+
+  table {
+    @apply w-full border-collapse;
+  }
+
+  th {
+    @apply whitespace-nowrap bg-ink px-4 py-3 text-right font-bold text-white;
+  }
+
+  td {
+    @apply whitespace-nowrap border-b border-neutral-200 px-4 py-3 text-right;
+  }
+
+  tbody tr:hover td {
+    @apply bg-accent/10;
+  }
+}
+
+@layer components {
+  .card {
+    @apply mb-5 overflow-x-auto rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm md:p-5;
+  }
+
+  .row {
+    @apply mb-3 flex flex-wrap items-center gap-3;
   }
 
   .ln {
-    grid-template-columns: 1fr 1fr
+    @apply mb-3 grid grid-cols-[120px_1fr_80px_100px_90px_40px] items-center gap-2 max-md:grid-cols-2 max-md:rounded-xl max-md:border max-md:border-neutral-200 max-md:p-3;
   }
+
+  .ln> :nth-child(1),
+  .ln> :nth-child(2) {
+    @apply max-md:col-span-2;
+  }
+
+  button.g {
+    @apply border-2 border-ink bg-white text-ink hover:bg-neutral-100;
+  }
+
+  button.r {
+    @apply bg-bad text-white hover:bg-red-700;
+  }
+
+  .low {
+    @apply bg-red-50;
+  }
+
+  .void {
+    @apply text-neutral-400 line-through;
+  }
+
+  .err {
+    @apply font-semibold text-bad;
+  }
+
+  .ok {
+    @apply font-semibold text-good;
+  }
+
+  .box {
+    @apply mx-auto mt-[15vh] max-w-sm;
+  }
+}
+@media (max-width: 767px) {
+  .row > input:not([type="checkbox"]), .row > select { flex: 1 1 45%; min-width: 0; }
+  .row > button { flex: 1 1 auto; }
 }
